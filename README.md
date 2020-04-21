@@ -1,5 +1,3 @@
-<![endif]-->
-
 # Accounting
 ![Accounting Logo](https://github.com/nigeldouglass/Accounting/raw/master/icon.png)
 

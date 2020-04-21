@@ -31,33 +31,44 @@ Napi::Object JSONParse(const Napi::CallbackInfo& info) {
   return parse.Call(json, { json_string }).As<Napi::Object>();
 }
 
-Napi::Boolean CreateDatabase(const Napi::CallbackInfo& info) {
+Napi::Object CreateDatabase(const Napi::CallbackInfo& info) {
+    Napi::Object queryReturn = Napi::Object::New(info.Env());
+    if (info.Length() < 1 || !info[0].As<Napi::String>()) {
+        queryReturn.Set("passed", false);
+        queryReturn.Set("err", "Undefined parameters for CreateDatabase. Should be CreateDatabase({locaiton: [LOCATION], name: [NAME]})");
+        return queryReturn;
+    } 
     dbJSON dbOBJ;
     Napi::Object json = JSONParse(info);
     if(json.Has("location")){
-        std::cout<<"Has location"<<std::endl;
         dbOBJ.location = json.Get("location").As<Napi::String>().Utf8Value();
         if(json.Has("name")){
-            std::cout<<"Has name"<<std::endl;
             dbOBJ.name = json.Get("name").As<Napi::String>().Utf8Value();
+        }else{
+            queryReturn.Set("passed", false);
+            queryReturn.Set("err", "DB Name was not set. Use name: '[NAME]'");
+            return queryReturn;
         }
+    }else{
+        queryReturn.Set("passed", false);
+        queryReturn.Set("err", "DB Location was not set. Use location: '[LOCATION]'");
+        return queryReturn;
     }
     if(json.Has("type")){
-        std::cout<<"Has type"<<std::endl;
         dbOBJ.type = json.Get("type").As<Napi::String>().Utf8Value();
     }
     if(json.Has("username")){
-        std::cout<<"Has username"<<std::endl;
         dbOBJ.username = json.Get("username").As<Napi::String>().Utf8Value();
     }
     if(json.Has("password")){
-        std::cout<<"Has password"<<std::endl;
         dbOBJ.password = json.Get("password").As<Napi::String>().Utf8Value();
     }
+
     if(json.Has("os")){
-        std::cout<<"Has os"<<std::endl;
         dbOBJ.os = json.Get("os").As<Napi::String>().Utf8Value();
     }
+
+
     if(!dbOBJ.location.empty()&&!dbOBJ.name.empty()){
         if(dbOBJ.os=="darwin"){
             dbOBJ.location += ((dbOBJ.location.back() == char('/')) ? "" : "/") + dbOBJ.name + "/";
@@ -71,8 +82,9 @@ Napi::Boolean CreateDatabase(const Napi::CallbackInfo& info) {
             db = new database(dbOBJ.location);
         }
     }else{
-        std::cout<<"Unable to create database obj"<<std::endl;
-        return Napi::Boolean::New(info.Env(),false);
+        queryReturn.Set("passed", false);
+        queryReturn.Set("err", "Unable to create database object.");
+        return queryReturn;
     }
     if(db){
         if(!dbOBJ.username.empty()){
@@ -81,17 +93,55 @@ Napi::Boolean CreateDatabase(const Napi::CallbackInfo& info) {
             db->create(dbOBJ.password);
         }
     }else{
-        std::cout<<"Unable to create database"<<std::endl;
-        return Napi::Boolean::New(info.Env(), false);
+        queryReturn.Set("passed", false);
+        queryReturn.Set("err", "Unable to create database object.");
+        return queryReturn;
     }
-    std::cout<<"Create database"<<std::endl;
-    return Napi::Boolean::New(info.Env(),true);;
+    queryReturn.Set("passed", true);
+    return queryReturn;
+}
+
+Napi::Object Query(const Napi::CallbackInfo& info) {
+    Napi::Object queryReturn = Napi::Object::New(info.Env());
+    if (info.Length() < 1 || !info[0].As<Napi::String>()) {
+        queryReturn.Set("passed", false);
+        queryReturn.Set("err", "Query is undefined. Should be for example Query('SELECT * FROM TABLE')");
+        return queryReturn;
+    } 
+    if(db){
+        executeReturn eR = db->execute(info[0].As<Napi::String>());
+        std::cout<<"Size: "+std::to_string(eR.rows.size())<<std::endl;
+        queryReturn.Set("passed", eR.passed);
+        if(eR.passed&&eR.rows.size()!=0){
+            Napi::Array data = Napi::Array::New(info.Env());
+            int id = 0;
+            for(auto &r : eR.rows){
+                Napi::Object row = Napi::Object::New(info.Env());
+                row.Set("id", id);
+                int col = 0;
+                for(const auto& column : r.getColumns()){
+                    row.Set(column, r.getDataAsString(column));
+                    col++;
+                }
+                data[id] = row;
+                id++;
+            }
+            queryReturn.Set("data", data);
+        }else{
+            queryReturn.Set("err", eR.err);
+        }
+    }else{
+        queryReturn.Set("passed", false);
+        queryReturn.Set("err", "Database was never created. Use CreateDatabase function before any queries.");
+    }
+    return queryReturn;
 }
 
 Napi::Object InitAll(Napi::Env env, Napi::Object exports) {
     exports["jsonStringify"] =  Napi::Function::New(env, JSONStringify);
     exports["jsonParse"] = Napi::Function::New(env, JSONParse);  
-    exports["CreateDatabase"] = Napi::Function::New(env, CreateDatabase);  
+    exports["CreateDatabase"] = Napi::Function::New(env, CreateDatabase);
+    exports["Query"] = Napi::Function::New(env, Query);  
 
   return exports;
 }

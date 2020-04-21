@@ -7,7 +7,7 @@ bool fileExists(std::string file){
 int findLastIndex(std::string& str, char x) 
 { 
     int index = -1; 
-    for (int i = 0; i < str.length(); i++) 
+    for (size_t i = 0; i < str.length(); i++) 
         if (str[i] == x) 
             index = i; 
     return index; 
@@ -23,7 +23,7 @@ int findLastIndex(std::string& str, std::string find)
     int foundIndex = -1;
     int index = -1;
     int curChar = 0; 
-    for (int i = 0; i < str.length(); i++) {
+    for (size_t i = 0; i < str.length(); i++) {
         if(index!=-1){
             for(int j = 1;j<n+1;j++){
 
@@ -56,8 +56,8 @@ int findLastIndex(std::string& str, std::string find)
 
 std::vector<std::string> split(std::string stringToBeSplitted, std::string delimeter){
 	std::vector<std::string> splittedString;
-	int startIndex = 0;
-	int  endIndex = 0;
+	size_t startIndex = 0;
+	size_t endIndex = 0;
 	while( (endIndex = stringToBeSplitted.find(delimeter, startIndex)) < stringToBeSplitted.size() ){
 		std::string val = stringToBeSplitted.substr(startIndex, endIndex - startIndex);
 		splittedString.push_back(val);
@@ -97,8 +97,6 @@ database::database(std::string databasePath, std::string format){
     if(!std::filesystem::is_directory(this->databasePath)){
         std::filesystem::create_directories(this->databasePath);
     }
-            std::cout<<this->databasePath+"\n";
-            std::cout<<fileExists(this->databasePath+"DB.info")+"\n";
     if(!fileExists(this->databasePath+"DB.info")){
         std::ofstream outfile (this->databasePath+"DB.info");
         outfile << "[Version=1.0]" << std::endl;
@@ -119,16 +117,11 @@ void database::create(std::string password, std::string username){
     if(!username.compare("")){
         username = "root";
     }
-    std::cout<<"User: "+username<<std::endl;
-    std::cout<<"Pass: "+password<<std::endl;
     if(!fileExists(this->databasePath+"SETUP"+this->format)){
-       // this->createTable("SETUP", "rootUsername varchar, rootPassword varchar");
         this->execute("CREATE TABLE SETUP (rootUsername varchar PRIMARY, rootPassword varchar)");
         this->execute("INSERT INTO SETUP (rootUsername, rootPassword) VALUES ('"+ username +"','"+ password+"')");
         this->execute("CREATE TABLE USERS (id integer PRIMARY AUTOINCREMENT, username varchar, password varchar)");
         this->execute("INSERT INTO USERS (username, password) VALUES ('"+ username +"','"+ password+"')");
-        
-        //std::cout << std::format("Created db with username {} and password {}", username, password) << std:endl;
     }
 }
 
@@ -147,34 +140,28 @@ executeReturn database::execute(std::string sql){
     auto token = split(sql, " ")[0];
     switch (convert(token)){
         case CREATE:
-            std::cout<<"Create\n";
-            ret.passed = this->createSQL(sql);
-            return ret;
+            return this->createSQL(sql);
             break;
         case INSERT:
-            ret.passed = this->insertSQL(sql);
-            return ret;
+            return this->insertSQL(sql);
             break;
         case SELECT:
-            return {this->selectSQL(sql)};
+            return this->selectSQL(sql);
             break;
         case DELETE:
-            std::cout << "DELETE SQL"<<std::endl;
             break;
         case UPDATE:
-            std::cout << "UPDATE SQL"<<std::endl;
             break;
         case ALTER:
-            std::cout << "ALTER SQL"<<std::endl;
             break;
         case NUL:
-            std::cout << "DON'T EXECUTE SQL"<<std::endl;
+            ret.err = "Unable to find sql function for ["+sql+"]";
             break;
     }
     return ret;
 }
 
-bool database::createSQL(std::string sql){
+executeReturn database::createSQL(std::string sql){
     std::vector<std::string> token = split(sql, " ");
     if(token.size()>=3){
         if(token[1] == "TABLE"){
@@ -188,40 +175,31 @@ bool database::createSQL(std::string sql){
             return this->createTable(table, variables);
         }
     }
-    return false;
+    return {false, "Create sql failed because there is not enough tokens. Try: CREATE TABLE [NAME]"};
 }
 
-bool database::createTable(std::string name, std::string variables){
-    std::cout<<"0"<<std::endl;
+executeReturn database::createTable(std::string name, std::string variables){
     std::for_each(name.begin(), name.end(), [](char & c) {
 		c = ::toupper(c);
 	});
-    std::cout<<"1"<<std::endl;
     std::string tableFile = this->databasePath + name + this->format;
-    std::cout<<"2"<<std::endl;
     if(fileExists(tableFile)){
-        std::cout<<"Unable to create table with name "+name+" as it already exists"<<std::endl;
-        //loadTable();
-        return false;
+        return {false, "Table "+name+" already exists!"};
     }else{
-         std::cout<<"3"<<std::endl;
         table newTable(name);
-                 std::cout<<"4"<<std::endl;
         bool failed = false;
         if(variables.size()!=0){
             variables = replace(variables, ", ", ",");
             std::vector<std::string> columns = split(variables, ",");
-            for(int i = 0; i < columns.size(); i++){
+            for(size_t i = 0; i < columns.size(); i++){
                 std::vector<std::string> data = split(columns[i], " ");
                 column newColumn;
                 newColumn.name = data[0];
-                std::cout<<"COL NAME: "+newColumn.name<<std::endl;
-                for(int j = 1; j < data.size(); j++){
+                for(size_t j = 1; j < data.size(); j++){
                     if(data[j]=="PRIMARY"){
                         newColumn.primary = true;
                         if(!newTable.setPrimary(newColumn.name)){
-                            std::cout<<"Error: Cannot set primary key as "+newColumn.name+" due to conflicting primary values in table "+name<<std::endl;
-                            failed = true;
+                            return {false, "Cannot set primary key as "+newColumn.name+" due to conflicting primary values in table "+name};
                             break;
                         }
                     }else if(data[j] == "AUTOINCREMENT" && newColumn.primary){
@@ -235,14 +213,14 @@ bool database::createTable(std::string name, std::string variables){
         }
         if(!failed){
             this->tables.insert(std::make_pair(name, newTable));
-        return true;
+        return {true};
         }
-        return false;
+        return {false, "Create table was never set to true."};
     }
-    return false;
+    return {false, "Create table because of unknown error."};
 }
 
-bool database::insertSQL(std::string sql){
+executeReturn database::insertSQL(std::string sql){
     std::vector<std::string> token = split(sql, " ");
     if(token.size()>=3){
         if(token[1] == "INTO"){
@@ -265,21 +243,23 @@ bool database::insertSQL(std::string sql){
                 values[0] = values[0].substr(2);    //Remove first '
                 values[values.size()-1] = values[values.size()-1].substr(0,values[values.size()-1].size()-2);   //Remove last '
                 return this->addData(table, columns, values);
+            }else{
+                return {false, "values never set."};
             }
+        }else{
+            return {false, "2nd token is not INTO. Should be INSERT INTO ...."};
         }
     }
-    return false;
+    return {false, "INSERT called but never executed."};
 }
 
-bool database::addData(std::string table, std::vector<std::string> columns, std::vector<std::string> values){
-    std::cout<<table<<std::endl;
+executeReturn database::addData(std::string table, std::vector<std::string> columns, std::vector<std::string> values){
     std::vector<std::string> tableColumns;
     auto it = this->tables.find(table);
     if ( it != this->tables.end() ) {
         tableColumns = it->second.getColumnNames();
     }else{
-        std::cout<<"Error: Cannot find table "+table;
-        return false;
+        return {false, "Cannot find table "+table};
     }
 
     if(columns.size()==0){
@@ -294,19 +274,18 @@ bool database::addData(std::string table, std::vector<std::string> columns, std:
         for (const auto& column : columns){
             if(!this->tables.find(table)->second.containsColumn(column)){
                 failed = true;
-                std::cout<<"Error: Table "+table+" does not have column "+column;
-                break;
+                return {false, "Table "+table+" does not have column "+column};
             }else{
                 std::string value = "";
                 if(values.size()>i){
                     value = values[i];
                 }
-                std::cout<<value<<std::endl;
                 type t = tables.find(table)->second.getColumnType(column);        
                 if(newRow.addData(column, value, t)){
                     failed = false;
                 }else{
                     failed = true;
+                    return {false, "Cannot add "+value+" into "+column+" as type has to be " +std::to_string(t)};
                     break;
                 }
             }
@@ -315,11 +294,10 @@ bool database::addData(std::string table, std::vector<std::string> columns, std:
         if(!failed){
             tables.find(table)->second.addRow(newRow);
             //SAVE
-            std::cout<<"Inserting data"<<std::endl;
-            return true;
+            return {true};
         }
     }
-    return false;
+    return {false, "Specified less columns than there is values"};
 }
 
 executeReturn database::selectSQL(std::string sql){
@@ -363,21 +341,13 @@ executeReturn database::selectSQL(std::string sql){
                 }
             }
         }
-        std::cout<<"SQL: "+sql<<std::endl;
         temp = this->selectData(table, what, where);
         if(!temp.passed){
             return temp;
         }
-        std::cout<<"--DEBUG--\n"
-                <<orderBy<<"\n"
-                <<lastQuotation<<"\n";
-                std::cout<<where+"\n";
         if(orderBy!=-1 && lastQuotation<orderBy){
-            std::cout<<sql+"\n";
             std::string orderByString = sql.substr(9+((where.size()!=0)?where.size()+1:0));
-            std::cout<<orderByString+"\n";
             std::vector<std::string> orderByTokens = split(orderByString, ", ");
-            std::cout<<"--END--\n";
             for(auto &order : orderByTokens){
                 std::vector<std::string> ordering = split(order, " ");
                 int direction = 1;
@@ -388,7 +358,6 @@ executeReturn database::selectSQL(std::string sql){
                     return temp;
             }
         }
-        std::cout<<"--E2--\n";
         if(temp.passed)
             return temp;
     }
@@ -396,7 +365,6 @@ executeReturn database::selectSQL(std::string sql){
 }
 
 executeReturn database::selectData(std::string table, std::vector<std::string> what, std::string where){
-    std::cout<<table<<"\n"<<where<<std::endl;
     executeReturn ret;
     if(tableExists(table)){
         std::list<row> temp = this->tables.find(table)->second.getDataVec();
@@ -410,6 +378,7 @@ executeReturn database::selectData(std::string table, std::vector<std::string> w
                         type t = tables.find(table)->second.getColumnType(c);  
                         tempRow.addData(c, r.getDataAsString(c), t);
                     }else{
+                        ret.err = "Unable to find column "+c+" in table "+table; 
                         return ret;
                     }
                 }
@@ -438,6 +407,7 @@ executeReturn database::selectData(std::string table, std::vector<std::string> w
         ret.passed = true;
         return ret;
     }
+    ret.err = "Unable to find table "+table;
     return ret;
 }
 
@@ -452,10 +422,9 @@ executeReturn database::orderData(std::list<row> data, std::string what, int dir
     }
     if (found){
         data.sort(RowCompare(what, direction));
-        return { true, data };
+        return { true,"", data };
     }
-    executeReturn ret;
-    return ret;
+    return {false, "Unable to order data. Unable to find "+what};
 }
 
 bool database::tableExists(std::string table){

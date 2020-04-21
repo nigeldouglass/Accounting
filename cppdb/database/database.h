@@ -13,6 +13,7 @@
 
 struct executeReturn{
     bool passed = false;
+    std::string err;
     std::list<row> rows;
 };
 
@@ -54,10 +55,10 @@ class database{
             else if(token == "CREATE") return CREATE;
             return NUL;
         };
-        bool createSQL(std::string sql);
-        bool createTable(std::string name, std::string variables);
-        bool insertSQL(std::string sql);
-        bool addData(std::string table, std::vector<std::string> what, std::vector<std::string> where);
+        executeReturn createSQL(std::string sql);
+        executeReturn createTable(std::string name, std::string variables);
+        executeReturn insertSQL(std::string sql);
+        executeReturn addData(std::string table, std::vector<std::string> what, std::vector<std::string> where);
         executeReturn selectSQL(std::string sql);
         executeReturn selectData(std::string table, std::vector<std::string> what, std::string where);
         executeReturn orderData(std::list<row> data, std::string what, int direction);

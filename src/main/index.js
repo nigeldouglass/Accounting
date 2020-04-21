@@ -26,11 +26,17 @@ function createWindow(){
 
     console.log(jsonObj);
     console.log(cppDB.jsonParse(jsonString));
+
     console.log(jsonString);
     console.log(cppDB.jsonStringify(jsonObj));
 
 
     console.log(cppDB.CreateDatabase(jsonString));
+    var q = cppDB.Query("SELECT * FROM USERS");
+    console.log(q);
+    if(q.passed){
+        console.log(q.data);
+    }
 
     win = new BrowserWindow({
         width: 800,

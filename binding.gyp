@@ -18,10 +18,14 @@
             "cflags_cc": [
                 "-std=c++17", 
                 "-stdlib=libc++",
-                "-fexceptions"
+                "-fexceptions", 
             ],
-            'cflags!': [ '-fno-exceptions' ],
-            "cflags_cc!": [ '-fno-exceptions' ],
+            'cflags!': [ 
+                '-fno-exceptions',
+            ],
+            "cflags_cc!": [ 
+                '-fno-exceptions',
+            ],
             "conditions": [
                 [ 'OS!="win"', {
                     "cflags+": [ "-std=c++17" ],
@@ -30,10 +34,10 @@
                 }],
                 [ 'OS=="mac"', {
                     "xcode_settings": {
-                    'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
-                    "OTHER_CPLUSPLUSFLAGS" : [ "-std=c++17", "-stdlib=libc++" ],
-                    "OTHER_LDFLAGS": [ "-stdlib=libc++" ],
-                    "MACOSX_DEPLOYMENT_TARGET": "10.15"
+                        'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
+                        "OTHER_CPLUSPLUSFLAGS" : [ "-std=c++17", "-stdlib=libc++" ],
+                        "OTHER_LDFLAGS": [ "-stdlib=libc++" ],
+                        "MACOSX_DEPLOYMENT_TARGET": "10.15"
                     },
                 }],
             ],
