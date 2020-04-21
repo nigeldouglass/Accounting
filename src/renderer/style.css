@@ -1,0 +1,11 @@
+:root{
+    --primary: #f0f0f0;
+    --secondary: #303a52;
+    --dark: #364f6b;
+    --dark-green: #17b978;
+    --cream: #fff4e3;
+}
+
+* {
+    font-family: Arial,Helvetica Neue,Helvetica,sans-serif; 
+}

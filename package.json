@@ -1,0 +1,36 @@
+{
+  "name": "accounts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron-webpack dev",
+    "build": "electron-webpack && electron-builder",
+    "rebuild": "electron-rebuild -f -w node-gyp",
+    "compile": "node-gyp configure build && npm run start"
+  },
+  "author": "Nigel Douglass",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^8.2.3",
+    "electron-builder": "^22.5.1",
+    "electron-rebuild": "^1.10.1",
+    "electron-webpack": "^2.8.2",
+    "vue": "^2.6.11",
+    "vue-loader": "^15.9.1",
+    "vue-router": "^3.1.6",
+    "vue-template-compiler": "^2.6.11",
+    "webpack": "^4.42.1"
+  },
+  "dependencies": {
+    "node": "^13.13.0",
+    "node-addon-api": "^2.0.0",
+    "source-map-support": "^0.5.16"
+  },
+  "electronWebpack": {
+    "renderer": {
+      "template": "src/index.html"
+    }
+  }
+}
