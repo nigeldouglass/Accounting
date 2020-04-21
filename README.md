@@ -25,3 +25,12 @@ The plan to create a multi-platform software solution for people to use to help 
 | Bank Reconcile | X | X | X | X | X |
 | Reports | X | X | X | X | X |
 | Year End | X | X | X | X | X |
+
+## Tools
+
+| Module | Made By | License |
+| --- | --- | --- |
+| NodeJS | [NodeJS](https://github.com/nodejs) |[MIT](https://github.com/nodejs/node/blob/master/LICENSE)|
+| Electron | [Electron](https://github.com/electron) |[MIT](https://github.com/electron/electron/blob/master/LICENSE)|
+| Vue | [Vue](https://github.com/vuejs) |[MIT](https://github.com/vuejs/vue/blob/dev/LICENSE)|
+| Webpack | [JS Foundation](https://github.com/webpack) | [MIT](https://github.com/webpack/webpack/blob/master/LICENSE)
