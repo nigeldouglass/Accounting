@@ -20,7 +20,7 @@ class field{
         void setName(const std::string* name);
         int getBytes(std::vector<std::byte>* dest, int pointer);
         int getSize();
-        static field* Byte(const std::string* name, std::byte value);
+        static field* Byte(const std::string* name, std::byte* value);
         static field* Short(const std::string* name, short value);
         static field* Char(const std::string* name, char value);
         static field* Int(const std::string* name, int value);
