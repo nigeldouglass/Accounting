@@ -1,6 +1,3 @@
-[submodule "Serialization"]
-	path = Serialization
-	url = https://github.com/nigeldouglass/Serialization
 [submodule "cppdb/utils/Serialization"]
 	path = cppdb/utils/Serialization
 	url = https://github.com/nigeldouglass/Serialization
