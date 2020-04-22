@@ -6,7 +6,8 @@
                 './cppdb/entry.cpp',
                 "<!@(node -p \"require('fs').readdirSync('./cppdb/database').filter(f=>f.endsWith('.cpp')).map(f=>'cppdb/database/'+f).join(' ')\")",
                 "<!@(node -p \"require('fs').readdirSync('./cppdb/database/structures').filter(f=>f.endsWith('.cpp')).map(f=>'cppdb/database/structures/'+f).join(' ')\")",
-                "<!@(node -p \"require('fs').readdirSync('./cppdb/utils').filter(f=>f.endsWith('.cpp')).map(f=>'cppdb/utils/'+f).join(' ')\")"
+                "<!@(node -p \"require('fs').readdirSync('./cppdb/utils').filter(f=>f.endsWith('.cpp')).map(f=>'cppdb/utils/'+f).join(' ')\")",
+                "<!@(node -p \"require('fs').readdirSync('./cppdb/utils/serialization').filter(f=>f.endsWith('.cpp')).map(f=>'cppdb/utils/serialization/'+f).join(' ')\")",
             ],
             'include_dirs': [
                 "<!@(node -p \"require('node-addon-api').include\")"

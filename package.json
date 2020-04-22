@@ -1,6 +1,6 @@
 {
   "name": "accounts",
-  "version": "1.0.0",
+  "version": "0.0.1-Alpha",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,9 @@
     "build": "electron-webpack && electron-builder",
     "rebuild": "electron-rebuild -f -w node-gyp",
     "compile": "node-gyp configure build && npm run start"
+  },
+  "build": {
+    "productName": "Accounting"
   },
   "author": "Nigel Douglass",
   "license": "MIT",
