@@ -14,10 +14,11 @@ class Serialization{
 
         static int writeBytes(std::vector<std::byte>* dest, int pointer, std::byte value);
         static int writeBytes(std::vector<std::byte>* dest, int pointer, std::vector<std::byte> value);
-        static int writeBytes(std::vector<std::byte>* dest, int pointer, const char* value, int length);
+        static int writeBytes(std::vector<std::byte>* dest, int pointer, const char* value);
         static int writeBytes(std::vector<std::byte>* dest, int pointer, short value);
         static int writeBytes(std::vector<std::byte>* dest, int pointer, int value);
         static int writeBytes(std::vector<std::byte>* dest, int pointer, int64_t value);
+        static int writeBytes(std::vector<std::byte>* dest, int pointer, double value);
         static int writeBytes(std::vector<std::byte>* dest, int pointer, std::string value);
 
         static std::byte readByte(std::vector<std::byte> src, int pointer);

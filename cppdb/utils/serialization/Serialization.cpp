@@ -1,7 +1,7 @@
 #include "Serialization.h"
 
 int Serialization::writeBytes(std::vector<std::byte>*dest, int pointer, std::byte value){
-    dest[pointer++] = value;
+    dest->at(pointer++) = value;
     return pointer;
 }
 
@@ -12,42 +12,48 @@ int Serialization::writeBytes(std::vector<std::byte>*dest, int pointer, std::vec
     return pointer;
 }
 
-int Serialization::writeBytes(std::vector<std::byte>*dest, int pointer, const char* value, int length){
-    for(size_t i = 0; i < length; i++){
-        dest[pointer++] = (std::byte)value[i];
+int Serialization::writeBytes(std::vector<std::byte>*dest, int pointer, const char* value){
+    for(size_t i = 0; i < std::strlen(value); i++){
+        dest->at(pointer++) = (std::byte)value[i];
     }
     return pointer;
 }
 
 int Serialization::writeBytes(std::vector<std::byte>*dest, int pointer, short value){
-    dest[pointer++] = (std::byte)((value>>8)&0xff);
-    dest[pointer++] = (std::byte)((value>>0)&0xff);
+    dest->at(pointer++) = (std::byte)((value>>8)&0xff);
+    dest->at(pointer++) = (std::byte)((value>>0)&0xff);
     return pointer;
 }
 
 int Serialization::writeBytes(std::vector<std::byte>*dest, int pointer, int value){
-    dest[pointer++] = (std::byte)((value>>24)&0xff);
-    dest[pointer++] = (std::byte)((value>>16)&0xff);
-    dest[pointer++] = (std::byte)((value>>8)&0xff);
-    dest[pointer++] = (std::byte)((value>>0)&0xff);
+    dest->at(pointer++) = (std::byte)((value>>24)&0xff);
+    dest->at(pointer++) = (std::byte)((value>>16)&0xff);
+    dest->at(pointer++) = (std::byte)((value>>8)&0xff);
+    dest->at(pointer++) = (std::byte)((value>>0)&0xff);
     return pointer;
 }
 
 int Serialization::writeBytes(std::vector<std::byte>*dest, int pointer, int64_t value){
-    dest[pointer++] = (std::byte)((value>>56)&0xff);
-    dest[pointer++] = (std::byte)((value>>48)&0xff);
-    dest[pointer++] = (std::byte)((value>>40)&0xff);
-    dest[pointer++] = (std::byte)((value>>32)&0xff);
-    dest[pointer++] = (std::byte)((value>>24)&0xff);
-    dest[pointer++] = (std::byte)((value>>16)&0xff);
-    dest[pointer++] = (std::byte)((value>>8)&0xff);
-    dest[pointer++] = (std::byte)((value>>0)&0xff);
+    dest->at(pointer++) = (std::byte)((value>>56)&0xff);
+    dest->at(pointer++) = (std::byte)((value>>48)&0xff);
+    dest->at(pointer++) = (std::byte)((value>>40)&0xff);
+    dest->at(pointer++) = (std::byte)((value>>32)&0xff);
+    dest->at(pointer++) = (std::byte)((value>>24)&0xff);
+    dest->at(pointer++) = (std::byte)((value>>16)&0xff);
+    dest->at(pointer++) = (std::byte)((value>>8)&0xff);
+    dest->at(pointer++) = (std::byte)((value>>0)&0xff);
     return pointer;
+}
+
+int Serialization::writeBytes(std::vector<std::byte>*dest, int pointer, double value){
+    //int64_t doub = value;
+    //return Serialization::writeBytes(dest, pointer, doub);
+    return 0;
 }
 
 int Serialization::writeBytes(std::vector<std::byte>*dest, int pointer, std::string value){
     pointer = Serialization::writeBytes(dest, pointer, (short)value.length());
-    return Serialization::writeBytes(dest, pointer, value.c_str(), (int)value.length());
+    return Serialization::writeBytes(dest, pointer, value.c_str());
 }
 
 std::byte Serialization::readByte(std::vector<std::byte> src, int pointer){
