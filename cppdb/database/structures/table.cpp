@@ -1,4 +1,5 @@
 #include "table.h"
+#include <fstream>
 
 table::table(std::string name){
     this->name = name;
@@ -95,10 +96,8 @@ void table::addRow(int id, row newRow){
             int primary = 1;
             if(id!=0){
                 if (this->rows.count(id-1)) {
-                    std::cout << "GETTING PRIOR PRIMARY------------------------" << std::endl;
                     dataType prior = this->rows.find(id-1)->second.getDataAsType(this->primaryColumn, integer);
                     if (prior.passed) {
-                        std::cout << "Primary: " << std::to_string(prior.integer) << std::endl;
                         primary = prior.integer + 1;
                     }
                     else {
@@ -111,7 +110,6 @@ void table::addRow(int id, row newRow){
         }
     }
     this->rows.insert(std::make_pair(id, newRow));
-    std::cout<<"Adding row to "+std::to_string(id)<<std::endl;
     if(this->nextRowID==id){
         this->nextRowID++;
     }
@@ -127,4 +125,48 @@ std::list<row> table::getDataVec(){
         ret.push_back(it->second);
     }
     return ret;
+}
+
+void table::save(std::string path){
+    std::vector<std::byte> stream;
+    std::unique_ptr<Database> db(new Database(this->name));
+    for( auto& [key, val] : this->getColumns()){
+        db->push_object(val.save());
+    }
+    for( auto& [key, val] : this->rows){
+        db->push_object(val.save());
+    } 
+    
+    db->getBytes(&stream, 0);
+    std::cout<<std::to_string(stream.size())<<std::endl;
+    File::save(path+"/"+this->name+".txt", stream);
+    //serialization::Serialization::printBytes(&stream);
+    
+    unsigned char cbuffer[stream.size()];
+    for(int i =0; i<stream.size();i++){
+        cbuffer[i] = (char)stream[i];
+    }
+    std::cout<<"["+std::to_string(stream.size())+"]"<<std::endl;
+    int len = sizeof(cbuffer)/sizeof(cbuffer[0]);
+    std::string test(reinterpret_cast<const char*>(cbuffer), sizeof(cbuffer)/sizeof(cbuffer[0]));
+//     std::cout<<test<<std::endl;
+//     std::cout<<"Test ["+std::to_string(test.size())+"] "+test<<std::endl;
+    
+//    std::cout<<"Encrypt: "<<encrypt(test)<<std::endl;
+//    std::cout<<"Size: "<<std::to_string(encrypt(test).size())<<std::endl;
+//    std::cout<<"Decrypt: "<<decrypt(encrypt(test))<<std::endl;
+//    std::cout<<"Size: "<<std::to_string(decrypt(encrypt(test)).size())<<std::endl;
+//    std::cout<<"END-+"<<std::endl;
+
+    std::ofstream myfile;
+  myfile.open (path+"/"+this->name+"-enc.txt");
+  myfile << encrypt(test);
+  myfile.close();
+
+  myfile.open (path+"/"+this->name+"-dec.txt");
+  myfile << decrypt(encrypt(test));
+  myfile.close();
+  
+
+     stream.clear();
 }

@@ -6,9 +6,18 @@
 #include <list>
 #include <vector>
 #include <algorithm>
+#include <memory>
 
 #include "column.h"
 #include "row.h"
+
+#include "../../utils/Serialization/Database.h"
+#include "../../utils/Serialization/Array.h"
+#include "../../utils/Serialization/Object.h"
+#include "../../utils/Serialization/Field.h"
+#include "../../utils/Serialization/File.h"
+
+#include "../encrypt.h"
 
 class table{
 
@@ -34,6 +43,8 @@ class table{
         std::map<int, row> getData();
         std::list<row> getDataVec();
         void getRow(int id);
+
+        void save(std::string location);
 
     private:
         std::string name;

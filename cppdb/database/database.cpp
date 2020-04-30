@@ -213,6 +213,8 @@ executeReturn database::createTable(std::string name, std::string variables){
         }
         if(!failed){
             this->tables.insert(std::make_pair(name, newTable));
+            std::cout<<"SAVE"<<std::endl;
+            newTable.save(this->databasePath);
         return {true};
         }
         return {false, "Create table was never set to true."};
@@ -294,6 +296,7 @@ executeReturn database::addData(std::string table, std::vector<std::string> colu
         if(!failed){
             tables.find(table)->second.addRow(newRow);
             //SAVE
+            tables.find(table)->second.save(this->databasePath);
             return {true};
         }
     }

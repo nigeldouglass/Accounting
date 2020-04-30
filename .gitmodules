@@ -1,3 +1,6 @@
 [submodule "cppdb/utils/Serialization"]
 	path = cppdb/utils/Serialization
 	url = https://github.com/nigeldouglass/Serialization
+[submodule "cppdb/include/openssl"]
+	path = cppdb/include/openssl
+	url = git@github.com:openssl/openssl.git

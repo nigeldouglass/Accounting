@@ -110,7 +110,6 @@ Napi::Object Query(const Napi::CallbackInfo& info) {
     } 
     if(db){
         executeReturn eR = db->execute(info[0].As<Napi::String>());
-        std::cout<<"Size: "+std::to_string(eR.rows.size())<<std::endl;
         queryReturn.Set("passed", eR.passed);
         if(eR.passed&&eR.rows.size()!=0){
             Napi::Array data = Napi::Array::New(info.Env());

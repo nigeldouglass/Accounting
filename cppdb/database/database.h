@@ -46,7 +46,6 @@ class database{
             NUL
         };
         OPERATORS convert(std::string token){
-            std::cout << "Token: "+token <<std::endl;
             if(token == "SELECT") return SELECT;
             else if(token == "DELETE") return DELETE;
             else if(token == "INSERT") return INSERT;

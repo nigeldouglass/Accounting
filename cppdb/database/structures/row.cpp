@@ -7,7 +7,6 @@ row::row(std::vector<std::string> columns){
 }
 
 bool row::addData(std::string column, std::string data, type t){
-    std::cout<<"Data is "+data<<std::endl;
     auto it = this->data.find(column);
     if ( it != this->data.end() ) {
         bool canAdd = false;
@@ -93,4 +92,14 @@ std::vector<std::string> row::getColumns(){
     ret.push_back(it->first);
     }
     return ret;
+}
+
+Object* row::save(){
+    Object* o = new Object("row");
+    for( auto& [key, val] : this->data){
+        //field* colData = field::String(key, val);
+        FieldNoName* colData = FieldNoName::Int(key,1);
+        o->push_fieldNoName(colData);
+    }
+    return o;
 }

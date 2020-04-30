@@ -7,6 +7,7 @@
 #include <iostream>
 #include "column.h"
 #include "../../utils/tryParse.h"
+#include "../../utils/Serialization/Object.h"
 
 class row{
 
@@ -18,6 +19,7 @@ class row{
         dataType getDataAsType(std::string column, type t);
         dataType getValueAsType(std::string value, type t);
         std::vector<std::string> getColumns();
+        Object* save();
     private:
         std::map<std::string, std::string> data;
         bool addData(std::string column, std::string data);

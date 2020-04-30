@@ -8,7 +8,8 @@
     "start": "electron-webpack dev",
     "build": "electron-webpack && electron-builder",
     "rebuild": "electron-rebuild -f -w node-gyp",
-    "compile": "node-gyp configure build && npm run start"
+    "compile": "node-gyp configure build && npm run start",
+    "addoncomp": "node-gyp configure build"
   },
   "build": {
     "productName": "Accounting"

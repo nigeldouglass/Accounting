@@ -2,6 +2,8 @@
 #define COLUMN_H
 
 #include <string>
+#include "../../utils/Serialization/Object.h"
+#include "../../utils/Serialization/Field.h"
 
 enum type { integer, doub, varchar, datetime, NUL};
 
@@ -19,6 +21,7 @@ class column{
             else if(token == "datetime") return datetime;
             else return NUL;
         };
+        Object* save();
     private:
 };
 

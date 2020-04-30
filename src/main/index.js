@@ -19,17 +19,17 @@ function createWindow(){
         name:       'Nigel',
         type:       'db',
         username:   'Manager',
-        password:   '',
+        password:   'Password',
         os:         os.platform()
     }
     const jsonString = JSON.stringify(jsonObj)
-
+/*
     console.log(jsonObj);
     console.log(cppDB.jsonParse(jsonString));
 
     console.log(jsonString);
     console.log(cppDB.jsonStringify(jsonObj));
-
+*/
 
     console.log(cppDB.CreateDatabase(jsonString));
     var q = cppDB.Query("SELECT * FROM USERS");
